@@ -1,0 +1,47 @@
+#! /usr/bin/env bash
+
+# Find directories or files in common app install locations
+
+# List of directories to search for
+locations=(
+  "$HOME/Library/Containers"
+  "$HOME/Library/Cookies"
+  "$HOME/Library/Address Book Plug-Ins"
+  "$HOME/Library/Saved Application State"
+  "$HOME/Library/Application Support"
+  "$HOME/Library/Application Scripts"
+  "$HOME/private/var/db/BootCaches"
+  "$HOME/Library/Preferences"
+  "$HOME/Library/Logs"
+  "$HOME/Library/Caches"
+  "$HOME/.cache"
+)
+
+# Function to search for directories matching the given string
+search_directories() {
+  local search_string="$1"
+
+  for location in "${locations[@]}"; do
+
+    # Use find command to search for directories matching the given string
+    if [ "$all_flag" ]; then
+        find "$location" -iname "*$search_string*" 2> /dev/null
+    else
+        find "$location" -type d -iname "*$search_string*" 2> /dev/null
+    fi
+  done
+}
+
+# Process command line options
+while getopts ":a" opt; do
+	case $opt in
+		a ) all_flag=true;; # Set the all_flag to indicate searching for all files and directories
+		* ) echo 'Unknown option or missing argument:' "$OPTARG"; exit 1;; # Display error for unknown options
+	esac
+done
+
+# Discard options
+shift "$((OPTIND-1))"
+
+# Call the search_directories function with the remaining arguments
+search_directories "$@"
